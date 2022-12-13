@@ -1,15 +1,17 @@
 import tweepy
 import pandas as pd
 import csv
-from textblob import TextBlob
-from wordcloud import WordCloud
-import numpy as np
 import re
 import matplotlib.pyplot as plt
+from flask import (
+    Flask,
+    jsonify, render_template, session, Response
+)
 plt.style.use('fivethirtyeight')
 
 #OUR VICTIM
-target="RealDonaldTrump"
+print("What twitter user are we investigating today? ")
+target=input()
 
 # get data
 keys = pd.read_csv('twitterKeys.csv')
@@ -33,11 +35,11 @@ api = tweepy.API(authenticate, wait_on_rate_limit=True)
 posts = api.user_timeline(screen_name=target, count=100, lang="en", tweet_mode="extended")
 
 # print last five tweets from account **TEMPORARY TEST RN*
-print("Show the 5 recent tweets: \n")
-i=0
-for tweet in posts[0:5]:
-    i=i+1
-    print(str(i) + ') ' + tweet.full_text + '\n')
+#print("Show the 5 recent tweets: \n")
+#i=0
+#for tweet in posts[0:5]:
+ #   i=i+1
+ #   print(str(i) + ') ' + tweet.full_text + '\n')
 
 # create dataframe with a column called tweets yeehaw
 df = pd.DataFrame([tweet.full_text for tweet in posts], columns = ['Tweets'])
@@ -63,18 +65,6 @@ with open("youtubeprofanity2.csv") as f:
     #badlist = [r'\b' + word + r'\b' for word in badlist]
 #print(badlist)
 
-#create function to see if a tweet is illegal or whatver
-#FUNCTION TRIAL 1
-#def findProfanity(text):
- #   for word in badlist:
-  #      if word.lower() in text:
-   #         print("BAD WORD FOUND: " + word)
-
-#FUNTION TRIAL 2
-#def findProfanity(data):
- #   for word in badlist:
-  #      badtweets=data.str.contains(word)
-   # return badtweets
 
 tweetsList =df.values.tolist()
 tweetsList= [''.join(x) for x in tweetsList]
@@ -83,13 +73,6 @@ tweetsList= [''.join(x) for x in tweetsList]
 
 caughtTweets=[]
 
-
-#FUNCTION TRIAL 3
-#def findProfanity(list):
- #   for i in list:
-  #      if any(word in list[i] for word in badlist)==True:
-   #         caughtTweets.append(i)
-    #return caughtTweets
 
 #FUNCTION TRIAL 4
 def findProfanity(list):
@@ -101,14 +84,10 @@ def findProfanity(list):
             for w in i.split():
                 #print(w)
                 if word.lower() == w.lower():
-                    #print('killme')
                     add=str("WORD: " + word + " TWEET: "+ i)
                     caughtTweets.append(add)
     return caughtTweets
 
-#FUNCTION TRIAL 5
-#def findProfanity(list):
- #   if any(word==any(badlist))
 
 print('These tweets go against our community guidelines: \n')
 final=findProfanity(tweetsList)
